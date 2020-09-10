@@ -18,22 +18,54 @@ interface PaymentGateway {
 
 
 
-class Client implements PaymentGateway {
-    String name;
-    double amount;
-    int id;
-    int discount_rate;
-    double discount_amount;
+class Client  {
+    private String name;
+    private double amount;
+    private int id;
 
     Client(){
 
     }
 
-    Client(int id, String name, double amount, int discount_rate){
+    Client(int id, String name, double amount){
         this.name = name;
         this.id = id;
         this.amount = amount;
-        this.discount_rate = discount_rate;
+    }
+
+
+
+    @Override
+    public String toString() {
+        return " " + id + " \t\t\t" + name + " \t\t\t" + amount +"\t\t\t" + discount_amount + " ";
+    }
+}
+
+
+
+
+
+
+
+class StandardClient extends Client implements PaymentGateway{
+    int discount_rate = 0;
+    
+    StandardClient(int id, String name, double amount){
+        super(id, name, amount);
+    }
+
+    @Override
+    public void processPayment(){
+        discount_amount =  amount * discount_rate * 0.01; 
+        amount = amount - discount_amount;
+    }
+}
+
+class LoyaltyClient extends Client implements PaymentGateway{
+    int discount_rate = 10;
+
+    LoyaltyClient(int id, String name, double amount){
+        super(id, name, amount);
     }
 
     @Override
@@ -42,46 +74,29 @@ class Client implements PaymentGateway {
         amount = amount - discount_amount;
     }
 
-    @Override
-    public String toString() {
-        return " " + id + " \t\t\t" + name + " \t\t\t" + amount +"\t\t\t\t" + discount_amount + " ";
-    }
 }
 
-
-
-
-
-
-
-class StandardClient extends Client{
-    int discount_rate = 0;
-    
-    StandardClient(int id, String name, double amount, int discount_rate){
-        super(id, name, amount, discount_rate);
-    }
-}
-
-class LoyaltyClient extends Client{
-    int discount_rate = 10;
-
-    LoyaltyClient(int id, String name, double amount, int discount_rate){
-        super(id, name, amount, discount_rate);
-    }
-
-}
-
-class StaffClient extends Client{
+class StaffClient extends Client implements PaymentGateway{
     int discount_rate = 20;
 
-    StaffClient(int id, String name, double amount, int discount_rate){
-        super(id, name, amount, discount_rate);
+    StaffClient(int id, String name, double amount){
+        super(id, name, amount);
+    }
+
+    @Override
+    public void processPayment(){
+        discount_amount =  amount * discount_rate * 0.01; 
+        amount = amount - discount_amount;
     }
 }
 
 
 
-
+class CarBookingService{
+    public void processStandardClient(){
+        
+    }
+}
 
 
 
@@ -107,15 +122,15 @@ class MyMainClass {
 
    
 
-    StandardClient stdClient = new StandardClient(1, "kushal", 100, 0);
+    StandardClient stdClient = new StandardClient(1, "kushal", 100);
     stdClient.processPayment();
     arraylist_standard.add(stdClient);
 
-    LoyaltyClient ltyClient = new LoyaltyClient(2, "mohan", 180, 10);
+    LoyaltyClient ltyClient = new LoyaltyClient(2, "mohan", 180);
     ltyClient.processPayment();
     arraylist_loyalty.add(ltyClient);
 
-    StaffClient stfClient = new StaffClient(3, "shyam", 200, 20);
+    StaffClient stfClient = new StaffClient(3, "shyam", 200);
     stfClient.processPayment();
     arraylist_staff.add(stfClient);
 
@@ -133,7 +148,8 @@ class MyMainClass {
         System.out.println("3. Employee Payment");
         System.out.println("4. Display List of Clients");
         System.out.println("5. Generate Report To View Payments Received");
-        System.out.println("6. Exit");  
+        System.out.println("6. Exit"); 
+        System.out.println("Enter your option:"); 
         int case_number = myInput.nextInt(); 
 
         switch(case_number){
@@ -154,7 +170,7 @@ class MyMainClass {
                     id = id + 1;
                     System.out.println("--Processing Standard Payment--");
 
-                    StandardClient stdClient1 = new StandardClient(id, name, payment, 0);
+                    StandardClient stdClient1 = new StandardClient(id, name, payment);
                     stdClient1.processPayment();
                     arraylist_standard.add(stdClient1);
 
@@ -170,6 +186,8 @@ class MyMainClass {
                            System.out.println("Enter the amount of this payment: ");
                            payment = myInput.nextInt();  
 
+                           System.out.println("--Processing Standard Payment--");
+
                            double temp_amount_std = client.amount;
                            double temp_discount_amount_std = client.discount_amount;
 
@@ -180,6 +198,10 @@ class MyMainClass {
 
                            client.amount += temp_amount_std;
                            client.discount_amount += temp_discount_amount_std;
+
+                           System.out.println("...");
+                           System.out.println("...");
+                           System.out.println("Finished processing payment.");
                         }
                     }
 
@@ -202,7 +224,7 @@ class MyMainClass {
                     id = id + 1;
                     System.out.println("--Processing Loyalty Payment--");
 
-                    LoyaltyClient ltyClient1 = new LoyaltyClient(id, name, payment, 10);
+                    LoyaltyClient ltyClient1 = new LoyaltyClient(id, name, payment);
                     ltyClient1.processPayment();
                     arraylist_loyalty.add(ltyClient1);
 
@@ -216,7 +238,9 @@ class MyMainClass {
                     for (LoyaltyClient client :arraylist_loyalty ) {
                         if(client.id == case_2_no){
                            System.out.println("Enter the amount of this payment: ");
-                           payment = myInput.nextInt();  
+                           payment = myInput.nextInt(); 
+
+                           System.out.println("--Processing Loyalty Payment--"); 
 
                            double temp_amount_lty = client.amount;
                            double temp_discount_amount_lty = client.discount_amount;
@@ -228,6 +252,11 @@ class MyMainClass {
 
                            client.amount += temp_amount_lty;
                            client.discount_amount += temp_discount_amount_lty;
+
+
+                           System.out.println("...");
+                           System.out.println("...");
+                           System.out.println("Finished processing payment.");
                         }
                     }
 
@@ -251,7 +280,7 @@ class MyMainClass {
                     System.out.println("--Processing Staff Payment--");
 
 
-                    StaffClient stfClient1 = new StaffClient(id, name, payment, 20);
+                    StaffClient stfClient1 = new StaffClient(id, name, payment);
                     stfClient1.processPayment();
                     arraylist_staff.add(stfClient1);
 
@@ -267,6 +296,8 @@ class MyMainClass {
                            System.out.println("Enter the amount of this payment: ");
                            payment = myInput.nextInt();  
 
+                           System.out.println("--Processing Staff Payment--");
+
                            double temp_amount_stf = client.amount;
                            double temp_discount_amount_stf = client.discount_amount;
 
@@ -277,6 +308,10 @@ class MyMainClass {
 
                            client.amount += temp_amount_stf;
                            client.discount_amount += temp_discount_amount_stf;
+
+                           System.out.println("...");
+                           System.out.println("...");
+                           System.out.println("Finished processing payment.");
                         }
                     }
 
@@ -349,7 +384,7 @@ class MyMainClass {
             case 6:
                 System.out.println("-- Exiting Federation Car Rental Payment Tracking System --");
                 System.out.println("........");
-                System.out.println(" -- Goodbye! --")
+                System.out.println(" -- Goodbye! --");
                 System.exit(0); 
         } 
     }
